@@ -9,15 +9,4 @@
       "destination": "/index.html"
     }
   ]
-}{
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://gki-kediri-website-production.up.railway.app/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
 }
