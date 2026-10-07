@@ -1,0 +1,225 @@
+{
+  "project_name": "GKI Kediri — Official Church Platform & Youth Ministry Portal",
+  "archetype": "ARCHETYPE 1: ORGANIC & EARTHY + YOUTH CONTEMPORARY EDITORIAL",
+  "theme_mode": "light",
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#FAF7F2",
+        "on_bg": "#2B1E16",
+        "on_bg_muted": "#6E5E53",
+        "roles": {
+          "link": "#385338",
+          "error": "#9E2A2B",
+          "success": "#2D6A4F",
+          "warning": "#B07D1E"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#F3EDE4",
+        "on_bg": "#2B1E16",
+        "on_bg_muted": "#6E5E53",
+        "roles": {
+          "link": "#385338",
+          "error": "#9E2A2B",
+          "success": "#2D6A4F"
+        }
+      },
+      {
+        "name": "panel_sage",
+        "kind": "solid",
+        "bg": "#E5EDE5",
+        "on_bg": "#1E301E",
+        "on_bg_muted": "#475F47",
+        "roles": {
+          "link": "#1E301E",
+          "error": "#9E2A2B",
+          "success": "#1E301E"
+        }
+      },
+      {
+        "name": "panel_warm_brown",
+        "kind": "solid",
+        "bg": "#EADECF",
+        "on_bg": "#2B1E16",
+        "on_bg_muted": "#5C4638",
+        "roles": {
+          "link": "#385338",
+          "error": "#9E2A2B",
+          "success": "#2D6A4F"
+        }
+      },
+      {
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#231710",
+        "on_bg": "#FBF8F4",
+        "on_bg_muted": "#CBB8A9",
+        "roles": {
+          "link": "#9EC49E",
+          "error": "#FF8A8A",
+          "success": "#7CE0A6"
+        }
+      },
+      {
+        "name": "glass_header",
+        "kind": "glass",
+        "contrast_against": "#FAF7F2",
+        "guarantee": "backdrop-blur-xl bg-[#FAF7F2]/85 border-b border-[#2B1E16]/10",
+        "on_bg": "#2B1E16",
+        "on_bg_muted": "#6E5E53",
+        "roles": {
+          "link": "#385338",
+          "error": "#9E2A2B",
+          "success": "#2D6A4F"
+        }
+      },
+      {
+        "name": "hero_banner",
+        "kind": "image",
+        "contrast_against": "#1B120C",
+        "guarantee": "scrim: linear-gradient(135deg, rgba(35, 23, 16, 0.88) 0%, rgba(56, 83, 56, 0.75) 100%)",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#E8DCD1",
+        "roles": {
+          "link": "#A7D4A7",
+          "error": "#FF9999",
+          "success": "#9FE2BF"
+        }
+      },
+      {
+        "name": "badge_sage",
+        "kind": "solid",
+        "bg": "#D5E3D5",
+        "on_bg": "#1E301E",
+        "on_bg_muted": "#3D583D"
+      },
+      {
+        "name": "badge_warm",
+        "kind": "solid",
+        "bg": "#DFCEBC",
+        "on_bg": "#2B1E16",
+        "on_bg_muted": "#5C4638"
+      }
+    ],
+    "accent": "#4D6B4D",
+    "on_accent": "#FFFFFF",
+    "brand_deep_brown": "#382419",
+    "brand_sage": "#5B7C5B",
+    "brand_terracotta": "#B85C38",
+    "brand_sand": "#F5EFE6"
+  },
+  "typography": {
+    "font_heading": "'Lora Variable', serif",
+    "font_sans": "'Plus Jakarta Sans Variable', sans-serif",
+    "font_mono": "'JetBrains Mono Variable', monospace",
+    "font_import": "@import \"@fontsource-variable/lora\";\n@import \"@fontsource-variable/plus-jakarta-sans\";\n@import \"@fontsource-variable/jetbrains-mono\";",
+    "scale_px": {
+      "display": 56,
+      "h1": 42,
+      "h2": 32,
+      "h3": 22,
+      "body": 16,
+      "caption": 14
+    },
+    "rules": {
+      "h1": "text-3xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-[#2B1E16] dark:text-[#FBF8F4]",
+      "h2": "text-2xl sm:text-3xl font-serif font-semibold tracking-tight text-[#2B1E16] dark:text-[#FBF8F4]",
+      "h3": "text-xl sm:text-2xl font-serif font-medium text-[#2B1E16] dark:text-[#FBF8F4]",
+      "overline": "text-xs font-mono font-semibold uppercase tracking-[0.2em] text-[#5B7C5B]",
+      "body": "text-base font-sans leading-relaxed text-[#2B1E16]/90",
+      "body_muted": "text-sm sm:text-base font-sans leading-normal text-[#6E5E53]"
+    }
+  },
+  "entry_surfaces": {
+    "/": "editorial asymmetric hero with kinetic scripture line-reveal and high-impact live worship image right, bento schedule below",
+    "/tentang": "split narrative layout — church history & pastoral vision left, core values bento grid right",
+    "/jadwal": "bento grid of weekly and Sunday service streams with interactive countdown and filter tabs",
+    "/pelayanan": "asymmetric multi-column commissions directory with interactive cards (Youth, Teens, Kids, Adults, Music, Diakonia)",
+    "/pokok-doa": "intimate prayer portal with warm terracotta form left and anonymous encouragement prayer feed right",
+    "/kritik-saran": "aspirasi jemaat submission surface with structured feedback categories and pastorate transparency note",
+    "/formulir": "filterable repository of official church administrative forms with direct PDF/doc download triggers",
+    "/pujian": "searchable Indonesian church songbook and lyrics repository with PDF sheet music & chord chart downloads",
+    "/warta-jemaat": "chronological digital bulletin rack with instant PDF viewer trigger, archive search, and weekly highlights",
+    "/kontak": "interactive location map card with Kediri church address, WhatsApp hotline, pastoral office hours, and social channels",
+    "/admin": "high-density tactical management console with prayer requests approval queue, warta uploader, formulir manager, and stats",
+    "/login": "branded split login — church positioning and pastoral emblem left, admin authentication form right"
+  },
+  "image_urls": {
+    "hero_worship": {
+      "url": "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaHVyY2glMjB3b3JzaGlwJTIwY29tbXVuaXR5fGVufDB8fHx8MTc5MDc0NzMzOXww&ixlib=rb-4.1.0&q=85",
+      "description": "Atmospheric worship gathering with warm stage lighting and raised hands",
+      "category": "hero_banner"
+    },
+    "youth_fellowship": {
+      "url": "https://images.unsplash.com/photo-1569292567777-e5d61a759322?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwzfHx5b3V0aCUyMGNvbW11bml0eSUyMGZlbGxvd3NoaXB8ZW58MHx8fHwxNzkwNzQ3MzM5fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Vibrant smiling Indonesian youth community in front of church entrance",
+      "category": "pelayanan_youth"
+    },
+    "music_ministry": {
+      "url": "https://images.unsplash.com/photo-1524650359799-842906ca1c06?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxNzV8MHwxfHNlYXJjaHw0fHxhY291c3RpYyUyMHdvcnNoaXAlMjBtdXNpYyUyMHNpbmdlcnxlbnwwfHx8fDE3OTA3NDczMzl8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Acoustic praise leader holding guitar ready for worship",
+      "category": "pujian_songbook"
+    },
+    "community_life": {
+      "url": "https://images.unsplash.com/photo-1531844251246-9a1bfaae09fc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2ODl8MHwxfHNlYXJjaHwyfHx5b3V0aCUyMGNvbW11bml0eSUyMGZlbGxvd3NoaXB8ZW58MHx8fHwxNzkwNzQ3MzM5fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Warm outdoor fellowship group photo under pine trees",
+      "category": "tentang_visi_misi"
+    }
+  },
+  "layout_strategy": {
+    "grid_system": "Bento Tetris Grid Mode A: grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 with deliberate asymmetry and organic rounded-2xl containers",
+    "spacing_scale": "p-6 sm:p-8 lg:p-12 with generous section padding py-16 sm:py-24",
+    "containers": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "borders": "1px solid rgba(43, 30, 22, 0.08) with smooth hover shadow-md transitions"
+  },
+  "motion_and_interactions": {
+    "kinetic_hero": "Staggered word & line mask reveals using motion/react variants for the main header (Gereja yang Mengasihi & Bertumbuh Bersama)",
+    "marquee": "Slow editorial ribbon displaying weekly memory verse (Ayat Minggu Ini), theme year, and upcoming service countdown",
+    "micro_interactions": "Smooth lift hover states on bento cards (-translate-y-1), soft badge pulse, active tab underline slider",
+    "scroll_experience": "Natural responsive momentum scroll, sticky crystal header with glassmorphism blur and saturation boost"
+  },
+  "accessibility_and_locale": {
+    "locale": "id-ID (Bahasa Indonesia throughout: Hari Minggu, Ibadah Raya, Warta Jemaat, Komisi Pemuda, Persekutuan Doa)",
+    "contrast_compliance": "All surface text meets minimum 4.5:1 APCA/WCAG AA contrast against respective solid/scrim backgrounds",
+    "testing_attributes": "Strict requirement: every interactive button, input, tab, download link, and modal trigger must carry role-based data-testid (e.g. data-testid=\"submit-pokok-doa-btn\", data-testid=\"download-warta-item-1\")"
+  },
+  "component_structure": {
+    "frontend_dir": "/app/frontend/src",
+    "core_pages": [
+      "/app/frontend/src/pages/Home.tsx",
+      "/app/frontend/src/pages/Tentang.tsx",
+      "/app/frontend/src/pages/Jadwal.tsx",
+      "/app/frontend/src/pages/Pelayanan.tsx",
+      "/app/frontend/src/pages/PokokDoa.tsx",
+      "/app/frontend/src/pages/KritikSaran.tsx",
+      "/app/frontend/src/pages/Formulir.tsx",
+      "/app/frontend/src/pages/Pujian.tsx",
+      "/app/frontend/src/pages/WartaJemaat.tsx",
+      "/app/frontend/src/pages/Kontak.tsx",
+      "/app/frontend/src/pages/Admin.tsx",
+      "/app/frontend/src/pages/Login.tsx"
+    ],
+    "components": [
+      "/app/frontend/src/components/Navbar.tsx",
+      "/app/frontend/src/components/Footer.tsx",
+      "/app/frontend/src/components/BentoJadwal.tsx",
+      "/app/frontend/src/components/EditorialMarquee.tsx",
+      "/app/frontend/src/components/PrayerFormModal.tsx",
+      "/app/frontend/src/components/DownloadCard.tsx",
+      "/app/frontend/src/components/SongViewerModal.tsx",
+      "/app/frontend/src/components/AdminHeader.tsx"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Theme: Implement warm organic chocolate (#2B1E16, #FAF7F2, #EADECF) paired with fresh youth sage green (#5B7C5B, #E5EDE5) — youthful, clean, editorial, NOT a corporate template.",
+    "Indonesian Language: Ensure all church terms are authentic Indonesian (e.g., Ibadah Raya 1 & 2, Kebaktian Remaja/Pemuda 'Youth Church', Sekolah Minggu 'Kids', Komisi Usia Indah 'Senior', Warta Jemaat, Pokok Doa, Pujian & Penyembahan).",
+    "Features Implementation: Build full reactive frontend forms with mock/real backend endpoints for (1) Pokok Doa (with toggle anonim/publik), (2) Kritik & Saran, (3) Formulir download with search & category filters, (4) Songbook Pujian with chord toggle / lyrics preview / download, (5) Warta Jemaat with PDF download & issue viewer, (6) Admin Dashboard with tabbed management for all entities.",
+    "Typography: Import @fontsource-variable/lora for elegant editorial titles and @fontsource-variable/plus-jakarta-sans for readable, modern body copy in index.css.",
+    "Ensure every form and button includes data-testid attributes for testing verification."
+  ]
+}
