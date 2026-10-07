@@ -17,6 +17,7 @@ from typing import List
 import bcrypt
 import httpx
 import jwt
+from bson import ObjectId
 from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, Request, Response, UploadFile
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -238,6 +239,7 @@ class GalleryItem(BaseModel):
     category: str = "Umum"
     description: str = ""
 
+
 # ---------- Seed ----------
 async def seed_admin() -> None:
     email = os.environ["ADMIN_EMAIL"].lower().strip()
@@ -354,6 +356,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# PASANG CORS DI ATAS SEBELUM ROUTER
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 
@@ -644,165 +656,4 @@ async def admin_update_formulir(form_id: str, body: FormIn, _: dict = Depends(ge
 async def admin_update_renungan(renungan_id: str, body: RenunganIn, _: dict = Depends(get_current_user)):
     res = await db.renungan.find_one_and_update({"id": renungan_id}, {"$set": body.model_dump()}, return_document=True)
     if not res:
-        raise HTTPException(status_code=404, detail="Renungan tidak ditemukan")
-    return Renungan(**res)
-
-
-# ---------- Arsip Khotbah (RSS kanal YouTube) ----------
-YOUTUBE_CHANNEL_ID = "UCsEHrioFb_5LnzjdphttcwA"
-KHOTBAH_CACHE: dict = {"at": 0.0, "items": []}
-
-
-@api_router.get("/khotbah")
-async def list_khotbah():
-    now = time.time()
-    if KHOTBAH_CACHE["items"] and now - KHOTBAH_CACHE["at"] < 1800:
-        return {"items": KHOTBAH_CACHE["items"]}
-    try:
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as http:
-            resp = await http.get(f"https://www.youtube.com/feeds/videos.xml?channel_id={YOUTUBE_CHANNEL_ID}")
-        resp.raise_for_status()
-        ns = {"atom": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
-        root = ET.fromstring(resp.text)
-        items = []
-        for entry in root.findall("atom:entry", ns)[:12]:
-            vid = entry.findtext("yt:videoId", default="", namespaces=ns)
-            if not vid:
-                continue
-            items.append({
-                "id": vid,
-                "title": entry.findtext("atom:title", default="", namespaces=ns),
-                "published": entry.findtext("atom:published", default="", namespaces=ns),
-                "thumbnail": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
-            })
-        if items:
-            KHOTBAH_CACHE["items"] = items
-            KHOTBAH_CACHE["at"] = now
-    except Exception:
-        logger.exception("Gagal mengambil RSS kanal YouTube")
-    return {"items": KHOTBAH_CACHE["items"]}
-
-
-
-# ---------- Konten Situs & Jadwal ----------
-@api_router.get("/content", response_model=SiteContent)
-async def get_content():
-    doc = await db.content.find_one({"id": "site"})
-    base = SiteContent().model_dump()
-    if not doc:
-        return SiteContent()
-    return SiteContent(**{k: doc.get(k, v) for k, v in base.items()})
-
-
-@api_router.put("/admin/content", response_model=SiteContent)
-async def update_content(body: SiteContent, _: dict = Depends(get_current_user)):
-    await db.content.update_one({"id": "site"}, {"$set": body.model_dump()}, upsert=True)
-    return body
-
-
-@api_router.get("/jadwal", response_model=List[Jadwal])
-async def list_jadwal():
-    docs = await db.jadwal.find().sort("created_at", 1).to_list(100)
-    return [Jadwal(**d) for d in docs]
-
-
-@api_router.post("/admin/jadwal", response_model=Jadwal)
-async def admin_create_jadwal(body: JadwalIn, _: dict = Depends(get_current_user)):
-    if body.tag not in ("minggu", "muda", "komisi"):
-        raise HTTPException(status_code=400, detail="Kelompok tidak dikenal")
-    item = Jadwal(**body.model_dump())
-    await db.jadwal.insert_one(item.model_dump())
-    return item
-
-
-@api_router.put("/admin/jadwal/{jadwal_id}", response_model=Jadwal)
-async def admin_update_jadwal(jadwal_id: str, body: JadwalIn, _: dict = Depends(get_current_user)):
-    res = await db.jadwal.find_one_and_update({"id": jadwal_id}, {"$set": body.model_dump()}, return_document=True)
-    if not res:
-        raise HTTPException(status_code=404, detail="Jadwal tidak ditemukan")
-    return Jadwal(**res)
-
-
-@api_router.delete("/admin/jadwal/{jadwal_id}")
-async def admin_delete_jadwal(jadwal_id: str, _: dict = Depends(get_current_user)):
-    res = await db.jadwal.delete_one({"id": jadwal_id})
-    if res.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Jadwal tidak ditemukan")
-    return {"ok": True}
-
-
-# ---------- Komisi Pelayanan ----------
-@api_router.get("/komisi", response_model=List[Komisi])
-async def list_komisi():
-    docs = await db.komisi.find().sort("created_at", 1).to_list(100)
-    return [Komisi(**d) for d in docs]
-
-
-@api_router.post("/admin/komisi", response_model=Komisi)
-async def admin_create_komisi(body: KomisiIn, _: dict = Depends(get_current_user)):
-    item = Komisi(**body.model_dump())
-    await db.komisi.insert_one(item.model_dump())
-    return item
-
-
-@api_router.put("/admin/komisi/{komisi_id}", response_model=Komisi)
-async def admin_update_komisi(komisi_id: str, body: KomisiIn, _: dict = Depends(get_current_user)):
-    res = await db.komisi.find_one_and_update({"id": komisi_id}, {"$set": body.model_dump()}, return_document=True)
-    if not res:
-        raise HTTPException(status_code=404, detail="Komisi tidak ditemukan")
-    return Komisi(**res)
-
-
-@api_router.delete("/admin/komisi/{komisi_id}")
-async def admin_delete_komisi(komisi_id: str, _: dict = Depends(get_current_user)):
-    res = await db.komisi.delete_one({"id": komisi_id})
-    if res.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Komisi tidak ditemukan")
-    return {"ok": True}
-
-
-# ---------- Stats ----------
-@api_router.get("/admin/stats")
-async def admin_stats(_: dict = Depends(get_current_user)):
-    return {
-        "pokok_doa_baru": await db.pokok_doa.count_documents({"status": "baru"}),
-        "pokok_doa_total": await db.pokok_doa.count_documents({}),
-        "kritik_saran": await db.kritik_saran.count_documents({}),
-        "warta": await db.warta.count_documents({}),
-        "formulir": await db.formulir.count_documents({}),
-        "renungan": await db.renungan.count_documents({}),
-    }
-
-
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# === PINTU API UNTUK GALERI FOTO ===
-
-# Pintu 1: Mengambil semua daftar foto untuk ditampilkan ke Jemaat (Publik)
-@api_router.get("/gallery")
-async def get_gallery():
-    galleries = await db.gallery.find().to_list(100)
-    for g in galleries:
-        g["id"] = str(g["_id"])
-        del g["_id"]
-    return galleries
-
-@api_router.post("/admin/gallery")
-async def add_gallery(item: GalleryItem, _: dict = Depends(get_current_user)):
-    new_photo = item.model_dump()
-    result = await db.gallery.insert_one(new_photo)
-    return {"message": "Foto berhasil ditambahkan", "id": str(result.inserted_id)}
-
-@api_router.delete("/admin/gallery/{item_id}")
-async def delete_gallery(item_id: str, _: dict = Depends(get_current_user)):
-    from bson import ObjectId
-    await db.gallery.delete_one({"_id": ObjectId(item_id)})
-    return {"message": "Foto berhasil dihapus"}
+        raise HTTPException(status_code
