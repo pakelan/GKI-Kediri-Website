@@ -526,12 +526,12 @@ function RenunganTab() {
   );
 }
 
-// === KOMPONEN BARU: GALLERY TAB (DENGAN UPLOAD COVER) ===
+// === KOMPONEN GALLERY TAB DENGAN UPLOAD COVER ===
 function GalleryTab() {
   const queryClient = useQueryClient();
   const emptyForm = { title: "", description: "", category: "Umum", image_url: "", thumbnail_path: "" };
   const [form, setForm] = useState(emptyForm);
-  const [file, setFile] = useState<File | null>(null); // State untuk file cover
+  const [file, setFile] = useState<File | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   
   const { data: items = [] } = useQuery({ queryKey: ["admin-gallery"], queryFn: () => apiGet<any[]>("/gallery") });
@@ -550,7 +550,6 @@ function GalleryTab() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       let final_thumbnail = form.thumbnail_path;
-      // Jika admin memilih file cover, upload ke server terlebih dahulu
       if (file) {
         final_thumbnail = await uploadFile(file);
       }
@@ -585,7 +584,13 @@ function GalleryTab() {
 
   const startEdit = (g: any) => {
     setEditId(g.id);
-    setForm({ title: g.title, description: g.description || "", category: g.category || "Umum", image_url: g.image_url, thumbnail_path: g.thumbnail_path || "" });
+    setForm({ 
+      title: g.title, 
+      description: g.description || "", 
+      category: g.category || "Umum", 
+      image_url: g.image_url, 
+      thumbnail_path: g.thumbnail_path || "" 
+    });
     setFile(null);
   };
 
@@ -620,9 +625,9 @@ function GalleryTab() {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="gal-url">Tautan (Link) Tujuan Google Drive</Label>
+          <Label htmlFor="gal-url">Tautan (Link) Google Drive</Label>
           <Input id="gal-url" type="url" required placeholder="https://drive.google.com/..." value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
-          <p className="text-xs text-[#6E5E53]">Bisa diisi link satu foto tunggal atau link satu folder Google Drive.</p>
+          <p className="text-xs text-[#6E5E53]">Link foto satuan atau link satu folder penuh.</p>
         </div>
 
         <div className="space-y-2">
@@ -655,7 +660,6 @@ function GalleryTab() {
         {items.length === 0 && <p className="rounded-2xl border border-dashed border-[#2B1E16]/15 p-8 text-center text-sm text-[#6E5E53]">Belum ada item galeri.</p>}
         {items.map((g) => (
           <div key={g.id} className="flex items-center gap-4 rounded-2xl border border-[#2B1E16]/8 bg-white p-5">
-            {/* Tampilkan Thumbnail jika ada */}
             <div className="h-14 w-14 shrink-0 rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center border">
               {g.thumbnail_path ? (
                 <img src={`/api/files/${g.thumbnail_path}`} alt="" className="h-full w-full object-cover" />
@@ -663,7 +667,6 @@ function GalleryTab() {
                 <ImageIcon className="h-5 w-5 text-gray-400" />
               )}
             </div>
-            
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-[#2B1E16]">{g.title}</p>
               <p className="truncate text-xs text-[#6E5E53]">{g.category}</p>
@@ -676,7 +679,8 @@ function GalleryTab() {
     </div>
   );
 }
-// === AKHIR KOMPONEN GALLERY TAB ===
+
+// === ENDING KOMPONEN GALLERY TAB DENGAN UPLOAD COVER ===
 
 
 function SiteContentTab() {
