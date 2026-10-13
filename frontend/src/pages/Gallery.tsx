@@ -49,11 +49,21 @@ export default function Gallery() {
               {/* Grid Foto per Kategori */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items.map((photo) => (
-                  <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden border">
+                  <a 
+                    href={photo.image_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    key={photo.id} 
+                    className="bg-white rounded-lg shadow-md overflow-hidden border hover:shadow-lg transition-shadow duration-200 block cursor-pointer"
+                  >
                     <img 
                       src={photo.image_url.startsWith('http') ? photo.image_url : `/api/files/${photo.image_url}`} 
                       alt={photo.title} 
-                      className="w-full h-56 object-cover"
+                      className="w-full h-56 object-cover bg-gray-100"
+                      onError={(e) => {
+                        // Jika Google Drive menolak pratinjau, tampilkan gambar pengganti
+                        e.currentTarget.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Klik+Buka+Foto';
+                      }}
                     />
                     <div className="p-4">
                       <h3 className="text-xl font-bold mt-1 text-[#2B1E16]">{photo.title}</h3>
@@ -61,7 +71,7 @@ export default function Gallery() {
                         <p className="text-gray-600 mt-1 text-sm">{photo.description}</p>
                       )}
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
