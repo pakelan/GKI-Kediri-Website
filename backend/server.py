@@ -218,6 +218,7 @@ class SiteContent(BaseModel):
     announcement_enabled: bool = False
     announcement_text: str = ""
     announcement_link: str = ""
+    gdrive_gallery_link: str = ""
 
 
 class KomisiIn(BaseModel):
