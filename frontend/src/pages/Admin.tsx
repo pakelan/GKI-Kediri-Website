@@ -531,7 +531,6 @@ function GalleryTab() {
   const queryClient = useQueryClient();
   const emptyForm = { title: "", description: "", category: "Umum", image_url: "" };
   const [form, setForm] = useState(emptyForm);
-  const [file, setFile] = useState<File | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   
   // Mengambil daftar foto dari backend
@@ -541,20 +540,21 @@ function GalleryTab() {
     queryClient.invalidateQueries({ queryKey: ["admin-gallery"] });
     queryClient.invalidateQueries({ queryKey: ["gallery"] }); // Refresh halaman galeri publik
   };
+  
   const resetForm = () => {
     setForm(emptyForm);
-    setFile(null);
     setEditId(null);
   };
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      let final_image_url = form.image_url;
-      // Jika ada file foto yang dipilih, upload dulu ke server
-      if (file) {
-        final_image_url = await uploadFile(file);
-      }
-      const payload = { title: form.title, description: form.description, category: form.category, image_url: final_image_url };
+      // Tidak perlu lagi proses upload file fisik, langsung kirim teks link-nya
+      const payload = { 
+        title: form.title, 
+        description: form.description, 
+        category: form.category, 
+        image_url: form.image_url 
+      };
       return editId ? apiPut(`/admin/gallery/${editId}`, payload) : apiPost("/admin/gallery", payload);
     },
     onSuccess: () => {
@@ -562,8 +562,9 @@ function GalleryTab() {
       resetForm();
       invalidate();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal menyimpan foto. Periksa isian dan pastikan foto sudah dipilih."),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal menyimpan foto. Periksa isian link."),
   });
+  
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiDelete(`/admin/gallery/${id}`),
     onSuccess: () => {
@@ -577,7 +578,6 @@ function GalleryTab() {
   const startEdit = (g: any) => {
     setEditId(g.id);
     setForm({ title: g.title, description: g.description || "", category: g.category || "Umum", image_url: g.image_url });
-    setFile(null);
   };
 
   const CATEGORIES = ["Umum", "Ibadah Minggu", "Perayaan Hari Besar", "Sekolah Minggu", "Pemuda & Remaja", "Keluarga & Komisi"];
@@ -587,15 +587,15 @@ function GalleryTab() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!form.image_url && !file) {
-            toast.error("Silakan pilih file foto terlebih dahulu.");
+          if (!form.image_url) {
+            toast.error("Silakan isi link Google Drive terlebih dahulu.");
             return;
           }
           saveMutation.mutate();
         }}
         className="space-y-4 rounded-3xl border border-[#2B1E16]/8 bg-white p-6 lg:col-span-2"
       >
-        <h3 className="font-heading text-lg font-bold text-[#2B1E16]">{editId ? "Ubah Foto" : "Upload Foto Baru"}</h3>
+        <h3 className="font-heading text-lg font-bold text-[#2B1E16]">{editId ? "Ubah Data Foto" : "Upload Foto Baru"}</h3>
         <div className="space-y-2">
           <Label htmlFor="gal-title">Judul Foto</Label>
           <Input id="gal-title" required placeholder="Ibadah Paskah 2026" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -617,19 +617,25 @@ function GalleryTab() {
           <Label htmlFor="gal-desc">Deskripsi Singkat (opsional)</Label>
           <Textarea id="gal-desc" rows={2} placeholder="Keseruan jemaat saat perayaan..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
+        
+        {/* BAGIAN INI YANG DIUBAH DARI INPUT FILE MENJADI INPUT TEKS (LINK) */}
         <div className="space-y-2">
-          <Label htmlFor="gal-file">File Foto (JPG/PNG)</Label>
-          <Input id="gal-file" type="file" accept=".png,.jpg,.jpeg" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-          {file ? (
-            <p className="text-xs text-[#385338]">Terpilih: {file.name}</p>
-          ) : form.image_url ? (
-            <p className="text-xs text-[#6E5E53]">Foto saat ini tetap dipakai bila tidak memilih foto baru.</p>
-          ) : null}
+          <Label htmlFor="gal-url">Tautan (Link) Foto Google Drive</Label>
+          <Input 
+            id="gal-url" 
+            type="url" 
+            required 
+            placeholder="https://drive.google.com/file/d/..." 
+            value={form.image_url} 
+            onChange={(e) => setForm({ ...form, image_url: e.target.value })} 
+          />
+          <p className="text-xs text-[#6E5E53]">Pastikan akses foto di Google Drive sudah diatur ke "Siapa saja yang memiliki tautan" (Anyone with the link).</p>
         </div>
+
         <div className="flex gap-2">
           <Button type="submit" disabled={saveMutation.isPending} className="flex-1 rounded-full bg-[#385338] text-white hover:bg-[#4D6B4D]">
             <Plus className="h-4 w-4" />
-            {saveMutation.isPending ? "Menyimpan..." : editId ? "Simpan Perubahan" : "Upload Foto"}
+            {saveMutation.isPending ? "Menyimpan..." : editId ? "Simpan Perubahan" : "Simpan Foto"}
           </Button>
           {editId && (
             <Button type="button" variant="outline" className="rounded-full" onClick={resetForm}>
@@ -642,6 +648,7 @@ function GalleryTab() {
         {items.length === 0 && <p className="rounded-2xl border border-dashed border-[#2B1E16]/15 p-8 text-center text-sm text-[#6E5E53]">Belum ada foto galeri.</p>}
         {items.map((g) => (
           <div key={g.id} className="flex items-center gap-4 rounded-2xl border border-[#2B1E16]/8 bg-white p-5">
+            {/* Foto tetap akan dirender otomatis */}
             <img src={g.image_url.startsWith("http") ? g.image_url : `/api/files/${g.image_url}`} alt={g.title} className="h-14 w-14 shrink-0 rounded-xl object-cover border" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-[#2B1E16]">{g.title}</p>
