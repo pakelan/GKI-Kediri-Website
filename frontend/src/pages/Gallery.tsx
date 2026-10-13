@@ -6,7 +6,6 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Meminta data foto dari Backend
     fetch('/api/gallery')
       .then(res => res.json())
       .then(data => {
@@ -19,7 +18,6 @@ export default function Gallery() {
       });
   }, []);
 
-  // Mengelompokkan foto berdasarkan kategori
   const groupedPhotos = photos.reduce((acc, photo) => {
     const category = photo.category || "Lainnya";
     if (!acc[category]) {
@@ -41,12 +39,10 @@ export default function Gallery() {
         <div className="space-y-12">
           {Object.entries(groupedPhotos).map(([category, items]) => (
             <div key={category} className="space-y-4">
-              {/* Judul Kategori */}
               <div className="border-b pb-2">
                 <h2 className="text-2xl font-bold text-[#2B1E16]">{category}</h2>
               </div>
               
-              {/* Grid Foto per Kategori */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items.map((photo) => (
                   <a 
@@ -54,21 +50,25 @@ export default function Gallery() {
                     target="_blank" 
                     rel="noopener noreferrer"
                     key={photo.id} 
-                    className="bg-white rounded-lg shadow-md overflow-hidden border hover:shadow-lg transition-shadow duration-200 block cursor-pointer"
+                    className="bg-white rounded-lg shadow-md overflow-hidden border hover:shadow-lg transition-shadow duration-200 block cursor-pointer group"
                   >
-                    <img 
-                      src={photo.image_url.startsWith('http') ? photo.image_url : `/api/files/${photo.image_url}`} 
-                      alt={photo.title} 
-                      className="w-full h-56 object-cover bg-gray-100"
-                      onError={(e) => {
-                        // Jika Google Drive menolak pratinjau, tampilkan gambar pengganti
-                        e.currentTarget.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Klik+Buka+Foto';
-                      }}
-                    />
+                    <div className="relative w-full h-56 bg-gray-100 overflow-hidden">
+                      {/* Merender Cover Thumbnail lokal */}
+                      <img 
+                        src={photo.thumbnail_path ? `/api/files/${photo.thumbnail_path}` : 'https://placehold.co/600x400/e2e8f0/64748b?text=Tanpa+Cover'} 
+                        alt={photo.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Gambar+Rusak';
+                        }}
+                      />
+                    </div>
                     <div className="p-4">
                       <h3 className="text-xl font-bold mt-1 text-[#2B1E16]">{photo.title}</h3>
-                      {photo.description && (
+                      {photo.description ? (
                         <p className="text-gray-600 mt-1 text-sm">{photo.description}</p>
+                      ) : (
+                        <p className="text-gray-400 italic mt-1 text-xs">Klik untuk melihat dokumentasi di Google Drive</p>
                       )}
                     </div>
                   </a>
