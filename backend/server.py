@@ -236,10 +236,10 @@ class Komisi(KomisiIn):
 
 class GalleryItem(BaseModel):
     title: str
-    image_url: str
+    image_url: str  # Ini untuk link tujuan (Google Drive)
     category: str = "Umum"
     description: str = ""
-
+    thumbnail_path: str = ""  # INI BARU: Untuk menyimpan file cover lokal
 
 # ---------- Seed ----------
 async def seed_admin() -> None:
@@ -817,12 +817,16 @@ async def get_gallery():
 
 @api_router.post("/admin/gallery")
 async def add_gallery(item: GalleryItem, _: dict = Depends(get_current_user)):
-    # Sistem akan otomatis mengecek dan mengubah link jika itu dari GDrive
-    item.image_url = convert_gdrive_link(item.image_url)
-    
     new_photo = item.model_dump()
     result = await db.gallery.insert_one(new_photo)
     return {"message": "Foto berhasil ditambahkan", "id": str(result.inserted_id)}
+
+
+@api_router.put("/admin/gallery/{item_id}")
+async def update_gallery(item_id: str, item: GalleryItem, _: dict = Depends(get_current_user)):
+    from bson import ObjectId
+    await db.gallery.update_one({"_id": ObjectId(item_id)}, {"$set": item.model_dump()})
+    return {"message": "Foto berhasil diperbarui"}
 
 
 @api_router.delete("/admin/gallery/{item_id}")
@@ -830,7 +834,6 @@ async def delete_gallery(item_id: str, _: dict = Depends(get_current_user)):
     from bson import ObjectId
     await db.gallery.delete_one({"_id": ObjectId(item_id)})
     return {"message": "Foto berhasil dihapus"}
-
 
 # Daftarkan router utama ke FastAPI
 app.include_router(api_router)
