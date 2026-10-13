@@ -787,6 +787,25 @@ async def admin_stats(_: dict = Depends(get_current_user)):
 
 
 # ---------- Galeri Foto (Dipindah ke dalam api_router) ----------
+
+def convert_gdrive_link(url: str) -> str:
+    """Otomatis mengubah link Google Drive biasa menjadi link gambar langsung (direct link)"""
+    if not url:
+        return url
+    
+    # Deteksi link Google Drive format 1 (contoh: /file/d/ID_FOTO/view)
+    match_file = re.search(r'/file/d/([a-zA-Z0-9_-]+)', url)
+    if match_file:
+        return f"https://drive.google.com/uc?export=view&id={match_file.group(1)}"
+    
+    # Deteksi link Google Drive format 2 (contoh: open?id=ID_FOTO)
+    match_id = re.search(r'[?&]id=([a-zA-Z0-9_-]+)', url)
+    if match_id:
+        return f"https://drive.google.com/uc?export=view&id={match_id.group(1)}"
+        
+    return url
+
+
 @api_router.get("/gallery")
 async def get_gallery():
     galleries = await db.gallery.find().to_list(100)
@@ -798,6 +817,9 @@ async def get_gallery():
 
 @api_router.post("/admin/gallery")
 async def add_gallery(item: GalleryItem, _: dict = Depends(get_current_user)):
+    # Sistem akan otomatis mengecek dan mengubah link jika itu dari GDrive
+    item.image_url = convert_gdrive_link(item.image_url)
+    
     new_photo = item.model_dump()
     result = await db.gallery.insert_one(new_photo)
     return {"message": "Foto berhasil ditambahkan", "id": str(result.inserted_id)}
@@ -805,6 +827,7 @@ async def add_gallery(item: GalleryItem, _: dict = Depends(get_current_user)):
 
 @api_router.delete("/admin/gallery/{item_id}")
 async def delete_gallery(item_id: str, _: dict = Depends(get_current_user)):
+    from bson import ObjectId
     await db.gallery.delete_one({"_id": ObjectId(item_id)})
     return {"message": "Foto berhasil dihapus"}
 
